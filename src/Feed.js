@@ -13,7 +13,7 @@ class Feed {
     return fetcher(this.Urls).then((res) => {
       const items = _(res).map(FeedItem.parse).orderBy(['PubDate'], ['asc']).value();
       const seq = items.reduce((r, v) => {
-        r = r.then(() => { return v.run(db); });
+        r = r.then(() => { return v.run(db, this.Handle); });
         return r;
       }, Promise.resolve());
       return seq;

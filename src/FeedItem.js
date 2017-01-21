@@ -1,5 +1,6 @@
 const cheerio = require('cheerio');
 const moment = require('moment');
+const twitter = require('./twitter');
 
 class FeedItem {
   constructor(item) {
@@ -8,23 +9,30 @@ class FeedItem {
     this.PubDate = item.PubDate;
     this.Image = item.Image;
   }
-  run(db) {
+  save(db) {
+    return db.run(
+      'insert into Items(Url,Title,PubDate) values (?,?,?)',
+      [this.Url, this.Title, this.PubDate]
+    );
+  }
+  run(db, handle) {
     return db.get('select * from Items where Url = ?', [this.Url]).then((res) => {
       if (res) {
         return Promise.resolve();
       }
-      if (moment().diff(this.PubDate) < moment.duration(2, 'hours')) {
-        console.log(this.getTweet());
+      if (moment().diff(this.PubDate) < moment.duration(3, 'hours') && handle) {
+        const twit = twitter(handle);
+        return twit.post(this).then(() => {
+          return this.save(db);
+        });
+      } else {
+        return this.save(db);
       }
-      return db.run(
-        'insert into Items(Url,Title,PubDate) values (?,?,?)',
-        [this.Url, this.Title, this.PubDate]
-      );
     }).catch((err) => {
       console.log(err);
     });
   }
-  getTweet() {
+  tweetString() {
     return `${this.Title} ${this.Url}`;
   }
 }

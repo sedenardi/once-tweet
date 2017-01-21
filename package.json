@@ -7,7 +7,8 @@
     "lodash": "^4.17.4",
     "moment": "^2.17.1",
     "request": "^2.79.0",
-    "sqlite": "^2.2.4"
+    "sqlite": "^2.2.4",
+    "twitter": "^1.7.0"
   },
   "devDependencies": {
     "express": "^4.14.0",
