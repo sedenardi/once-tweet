@@ -1,5 +1,6 @@
 const cheerio = require('cheerio');
 const moment = require('moment');
+const _ = require('lodash');
 const twitter = require('./twitter');
 
 class FeedItem {
@@ -10,10 +11,7 @@ class FeedItem {
     this.Image = item.Image;
   }
   save(db) {
-    return db.run(
-      'insert into Items(Url,Title,PubDate) values (?,?,?);',
-      [this.Url, this.Title, this.PubDate]
-    );
+    return db.run('insert into Items(Url) values (?);', [this.Url]);
   }
   run(db, handle) {
     return db.get('select * from Items where Url = ?;', [this.Url]).then((res) => {
@@ -48,6 +46,12 @@ FeedItem.parse = function(rawItem) {
     const imgs = $('body').find('img');
     if (imgs.length) {
       item.Image = imgs.eq(0).attr('src');
+    } else {
+      const media = _.get(rawItem, '[media:content][@]');
+      if (media && media.medium === 'image' &&
+        (parseInt(media.width) > 400 || parseInt(media.height) > 400 || (!media.width && !media.height))) {
+        item.Image = media.url;
+      }
     }
   }
 

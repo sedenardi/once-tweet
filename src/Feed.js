@@ -33,7 +33,7 @@ Feed.parse = function(feed, data) {
   feed.Handle = _.find(data[2], { FeedId: feed.id });
 
   const lastUpdate = _.find(data[3], { Name: 'LastUpdate' });
-  feed.LastUpdate = lastUpdate ? moment(lastUpdate.Value) : moment().subtract(3, 'hours');
+  feed.LastUpdate = lastUpdate.Value ? moment(lastUpdate.Value) : moment().subtract(3, 'hours');
 
   return new Feed(feed);
 };
