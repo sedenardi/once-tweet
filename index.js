@@ -16,9 +16,11 @@ const run = function() {
 };
 
 module.exports = {
-  handler: (event, context) => {
+  handler: (event, context, callback) => {
     run().then(() => {
-      context.done();
+      callback();
+    }).catch((err) => {
+      callback(err);
     });
   }
 };
