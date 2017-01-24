@@ -7,7 +7,9 @@ const zlib = require('bluebird').promisifyAll(require('zlib'));
 const fs = require('bluebird').promisifyAll(require('fs'));
 const s3 = require('./s3')();
 
-const filePath = path.resolve(__dirname, '../rss-tweet.sqlite');
+const fileName = 'rss-tweet.sqlite';
+const filePath = path.resolve(__dirname, `../${fileName}`);
+const tmpPath = path.resolve(`/tmp/${fileName}`)
 const zFilePath = filePath + '.zip';
 
 const localOpen = function() {
@@ -30,12 +32,12 @@ const s3Open = function() {
   return s3.getObject('rss-tweet.sqlite.zip').then((zipped) => {
     return zlib.gunzipAsync(zipped);
   }).then((res) => {
-    return fs.writeFileAsync(filePath, res);
+    return fs.writeFileAsync(tmpPath, res);
   });
 };
 
 const s3Close = function() {
-  return fs.readFileAsync(filePath).then((res) => {
+  return fs.readFileAsync(tmpPath).then((res) => {
     return zlib.gzipAsync(res);
   }).then((zipped) => {
     return s3.upload('rss-tweet.sqlite.zip', zipped);
@@ -49,9 +51,10 @@ module.exports = function(opts) {
       const zAction = opts.noCompression ?
         Promise.resolve() :
         (opts.local ? localOpen() : s3Open());
+      const path = opts.local ? filePath : tmpPath;
       return zAction.then(() => {
         return new Promise((resolve, reject) => {
-          db = new sqlite3.Database(filePath, (err) => {
+          db = new sqlite3.Database(path, (err) => {
             if (err) { return reject(err); }
             return resolve();
           });
