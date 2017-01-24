@@ -15,9 +15,8 @@ class Feeds {
   }
   run(data) {
     const runs = this.Feeds.map((f) => { return f.run(data); });
-    return Promise.all(runs).then(() => {
-      return this.save(data);
-    });
+    runs.push(this.save(data));
+    return Promise.all(runs);
   }
 }
 Feeds.get = function(data) {
