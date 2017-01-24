@@ -1,16 +1,13 @@
-const db = require('sqlite');
+const data = require('./src/data');
 const Feeds = require('./src/Feeds');
-const path = require('path');
-
-const filePath = path.resolve(__dirname, './rss-tweet.sqlite');
 
 const run = function() {
-  db.open(filePath).then(() => {
-    return Feeds.get(db);
-  }).then((feeds) => {
-    return feeds.run(db);
+  data.open().then((db) => {
+    return Feeds.get(db).then((feeds) => {
+      return feeds.run(db);
+    });
   }).then(() => {
-    return db.close();
+    return data.close();
   }).catch((err) => {
     console.log(err);
   });
