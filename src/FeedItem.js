@@ -17,7 +17,7 @@ class FeedItem {
       'insert into Items(Url,PubDate) values (?,?);',
       [this.Url, this.PubDate]);
   }
-  run(data, handle) {
+  run(data, handle, last) {
     return data.get('select * from Items where Url like ?;', [this.Url]).then((res) => {
       if (res) {
         return Promise.resolve();
@@ -25,7 +25,7 @@ class FeedItem {
       return this.save(data).then(() => {
         if (moment().diff(this.PubDate) < moment.duration(3, 'hours') && handle) {
           const twit = twitter(handle);
-          return twit.post(this);
+          return twit.post(this, last);
         } else {
           return Promise.resolve();
         }

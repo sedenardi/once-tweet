@@ -53,7 +53,7 @@ module.exports = function(handle) {
   };
 
   return {
-    post: function(feedItem) {
+    post: function(feedItem, last) {
       const p = new Promise((resolve, reject) => {
         if (feedItem.Image) {
           postWithMedia(feedItem, (err, res) => {
@@ -69,7 +69,7 @@ module.exports = function(handle) {
       });
       return p.then(() => {
         console.log(`Tweeting from ${handle.Name}`);
-        return sleep();
+        return !last ? sleep() : Promise.resolve();
       });
     }
   };

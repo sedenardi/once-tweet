@@ -23,8 +23,9 @@ class Feed {
         .orderBy(['PubDate'], ['asc'])
         .value();
       console.log(`${items.length} items in ${this.Name}`);
-      const seq = items.reduce((r, v) => {
-        r = r.then(() => { return v.run(data, this.Handle); });
+      const seq = items.reduce((r, v, i) => {
+        const last = i === (items.length - 1);
+        r = r.then(() => { return v.run(data, this.Handle, last); });
         return r;
       }, Promise.resolve());
       return seq;
