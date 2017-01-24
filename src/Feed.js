@@ -19,6 +19,7 @@ class Feed {
       const items = _(res)
         .filter((r) => { return r.pubDate > this.LastUpdate; })
         .map(FeedItem.parse)
+        .uniqBy('Url')
         .orderBy(['PubDate'], ['asc'])
         .value();
       console.log(`${items.length} items in ${this.Name}`);
