@@ -23,3 +23,8 @@ create table Items (
   Title text,
   PubDate datetime
 );
+
+create table Meta (
+  Name text primary key,
+  Value text
+);

@@ -11,16 +11,16 @@ class FeedItem {
   }
   save(db) {
     return db.run(
-      'insert into Items(Url,Title,PubDate) values (?,?,?)',
+      'insert into Items(Url,Title,PubDate) values (?,?,?);',
       [this.Url, this.Title, this.PubDate]
     );
   }
   run(db, handle) {
-    return db.get('select * from Items where Url = ?', [this.Url]).then((res) => {
+    return db.get('select * from Items where Url = ?;', [this.Url]).then((res) => {
       if (res) {
         return Promise.resolve();
       }
-      if (moment().diff(this.PubDate) < moment.duration(3, 'hours') && handle) {
+      if (moment().diff(this.PubDate) < moment.duration(3, 'hours') && handle && false) {
         const twit = twitter(handle);
         return twit.post(this).then(() => {
           return this.save(db);
