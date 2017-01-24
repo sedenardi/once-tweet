@@ -1,3 +1,5 @@
+'use strict';
+
 const moment = require('moment');
 const Feed = require('./Feed');
 
@@ -5,25 +7,25 @@ class Feeds {
   constructor(feeds) {
     this.Feeds = feeds.Feeds;
   }
-  save(db) {
-    return db.run(
+  save(data) {
+    return data.run(
       'update Meta set Value = ? where Name = ?;',
       [moment().toISOString(), 'LastUpdate']
     );
   }
-  run(db) {
-    const runs = this.Feeds.map((f) => { return f.run(db); });
+  run(data) {
+    const runs = this.Feeds.map((f) => { return f.run(data); });
     return Promise.all(runs).then(() => {
-      return this.save(db);
+      return this.save(data);
     });
   }
 }
-Feeds.get = function(db) {
+Feeds.get = function(data) {
   return Promise.all([
-    db.all('select * from Feeds;'),
-    db.all('select * from FeedUrls;'),
-    db.all('select * from FeedHandles;'),
-    db.all('select * from Meta;')
+    data.all('select * from Feeds;'),
+    data.all('select * from FeedUrls;'),
+    data.all('select * from FeedHandles;'),
+    data.all('select * from Meta;')
   ]).then((res) => {
     const feeds = res[0].map((v) => {
       return Feed.parse(v, res);

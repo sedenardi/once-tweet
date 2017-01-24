@@ -1,3 +1,5 @@
+'use strict';
+
 const cheerio = require('cheerio');
 const moment = require('moment');
 const _ = require('lodash');
@@ -10,23 +12,23 @@ class FeedItem {
     this.PubDate = item.PubDate;
     this.Image = item.Image;
   }
-  save(db) {
-    return db.run(
+  save(data) {
+    return data.run(
       'insert into Items(Url,PubDate) values (?,?);',
       [this.Url, this.PubDate]);
   }
-  run(db, handle) {
-    return db.get('select * from Items where Url = ?;', [this.Url]).then((res) => {
+  run(data, handle) {
+    return data.get('select * from Items where Url = ?;', [this.Url]).then((res) => {
       if (res) {
         return Promise.resolve();
       }
       if (moment().diff(this.PubDate) < moment.duration(3, 'hours') && handle) {
         const twit = twitter(handle);
         return twit.post(this).then(() => {
-          return this.save(db);
+          return this.save(data);
         });
       } else {
-        return this.save(db);
+        return this.save(data);
       }
     }).catch((err) => {
       console.log(err);

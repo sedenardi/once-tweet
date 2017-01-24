@@ -1,3 +1,5 @@
+'use strict';
+
 const _ = require('lodash');
 const moment = require('moment');
 const fetcher = require('./fetcher');
@@ -12,7 +14,7 @@ class Feed {
 
     this.LastUpdate = feed.LastUpdate;
   }
-  run(db) {
+  run(data) {
     return fetcher(this.Urls).then((res) => {
       const items = _(res)
         .filter((r) => { return r.pubDate > this.LastUpdate; })
@@ -21,7 +23,7 @@ class Feed {
         .value();
       console.log(`${items.length} items in ${this.Name}`);
       const seq = items.reduce((r, v) => {
-        r = r.then(() => { return v.run(db, this.Handle); });
+        r = r.then(() => { return v.run(data, this.Handle); });
         return r;
       }, Promise.resolve());
       return seq;
