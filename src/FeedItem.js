@@ -20,7 +20,7 @@ class FeedItem {
       if (res) {
         return Promise.resolve();
       }
-      if (moment().diff(this.PubDate) < moment.duration(3, 'hours') && handle && false) {
+      if (moment().diff(this.PubDate) < moment.duration(3, 'hours') && handle) {
         const twit = twitter(handle);
         return twit.post(this).then(() => {
           return this.save(db);
