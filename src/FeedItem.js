@@ -39,7 +39,7 @@ class FeedItem {
 FeedItem.parse = function(rawItem) {
   const item = {
     Title: rawItem.title,
-    Url: rawItem.link,
+    Url: rawItem.link.split(/[?#]/)[0],
     PubDate: rawItem.pubDate
   };
 

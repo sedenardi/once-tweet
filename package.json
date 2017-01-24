@@ -2,6 +2,7 @@
   "name": "one-tweet",
   "main": "index.js",
   "dependencies": {
+    "aws-sdk": "^2.7.27",
     "bluebird": "^3.4.7",
     "cheerio": "^0.22.0",
     "feedparser": "^2.1.0",

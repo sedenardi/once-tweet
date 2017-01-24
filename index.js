@@ -1,4 +1,4 @@
-const data = require('./src/data');
+const data = require('./src/data')({ noCompression: false, local: false });
 const Feeds = require('./src/Feeds');
 
 const run = function() {
