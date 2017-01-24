@@ -13,4 +13,10 @@ const run = function() {
   });
 };
 
-run();
+module.exports = {
+  handler: (event, context) => {
+    run().then(() => {
+      context.done();
+    });
+  }
+};
