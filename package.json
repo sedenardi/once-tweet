@@ -2,6 +2,7 @@
   "name": "one-tweet",
   "main": "index.js",
   "dependencies": {
+    "bluebird": "^3.4.7",
     "cheerio": "^0.22.0",
     "feedparser": "^2.1.0",
     "lodash": "^4.17.4",

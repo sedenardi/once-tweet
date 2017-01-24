@@ -18,7 +18,8 @@ create table FeedHandles (
 );
 
 create table Items (
-  Url text primary key
+  Url text primary key,
+  PubDate datetime
 );
 
 create table Meta (

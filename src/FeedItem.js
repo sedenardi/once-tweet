@@ -11,7 +11,9 @@ class FeedItem {
     this.Image = item.Image;
   }
   save(db) {
-    return db.run('insert into Items(Url) values (?);', [this.Url]);
+    return db.run(
+      'insert into Items(Url,PubDate) values (?,?);',
+      [this.Url, this.PubDate]);
   }
   run(db, handle) {
     return db.get('select * from Items where Url = ?;', [this.Url]).then((res) => {
