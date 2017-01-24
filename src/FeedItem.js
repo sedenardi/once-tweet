@@ -18,18 +18,18 @@ class FeedItem {
       [this.Url, this.PubDate]);
   }
   run(data, handle) {
-    return data.get('select * from Items where Url = ?;', [this.Url]).then((res) => {
+    return data.get('select * from Items where Url like ?;', [this.Url]).then((res) => {
       if (res) {
         return Promise.resolve();
       }
-      if (moment().diff(this.PubDate) < moment.duration(3, 'hours') && handle) {
-        const twit = twitter(handle);
-        return twit.post(this).then(() => {
-          return this.save(data);
-        });
-      } else {
-        return this.save(data);
-      }
+      return this.save(data).then(() => {
+        if (moment().diff(this.PubDate) < moment.duration(3, 'hours') && handle) {
+          const twit = twitter(handle);
+          return twit.post(this);
+        } else {
+          return Promise.resolve();
+        }
+      });
     }).catch((err) => {
       console.log(err);
     });
@@ -41,7 +41,7 @@ class FeedItem {
 FeedItem.parse = function(rawItem) {
   const item = {
     Title: rawItem.title,
-    Url: rawItem.link.split(/[?#]/)[0],
+    Url: rawItem.link.split(/[?#]/)[0].toLowerCase(),
     PubDate: rawItem.pubDate
   };
 

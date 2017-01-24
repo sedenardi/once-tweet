@@ -24,7 +24,7 @@ module.exports = function(handle) {
       if (error) {
         if (error.length) {
           if (error[0].code === 187) {
-            console.log('Dupe tweet.');
+            console.log(`Dupe tweet from ${handle.Name}`);
             return cb();
           }
         }
