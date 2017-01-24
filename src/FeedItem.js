@@ -35,7 +35,7 @@ class FeedItem {
     });
   }
   tweetString() {
-    return `${this.Title} ${this.Url}`;
+    return `${this.Title.slice(0, 116)} ${this.Url}`;
   }
 }
 FeedItem.parse = function(rawItem) {

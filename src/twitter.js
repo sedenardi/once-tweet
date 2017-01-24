@@ -24,7 +24,7 @@ module.exports = function(handle) {
       if (error) {
         if (error.length) {
           if (error[0].code === 187) {
-            console.log(`Dupe tweet from ${handle.Name}`);
+            console.log(`Dupe tweet from ${handle.Name}: ${status.status}`);
             return cb();
           }
         }
@@ -36,11 +36,14 @@ module.exports = function(handle) {
 
   const postWithMedia = function(item, cb) {
     const status = { status: item.tweetString() };
-    request(item.Image, (error, response, body) => {
+    request({
+      url: item.Image,
+      encoding: null
+    }, (error, response, body) => {
       if (error || response.statusCode !== 200) {
         retryablePost(status, cb);
       } else {
-        client.post('media/upload', {media: body}, (err, media, response) => {
+        client.post('media/upload', { media: body }, (err, media, response) => {
           if (!err) {
             status.media_ids = media.media_id_string;
             retryablePost(status, cb);
