@@ -4,6 +4,13 @@ const Twitter = require('twitter');
 const request = require('request');
 const config = require('../config');
 
+const SLEEP_TIME = 8*1000;
+const sleep = function() {
+  return new Promise((resolve) => {
+    setTimeout(() => { resolve(); }, SLEEP_TIME);
+  });
+};
+
 module.exports = function(handle) {
   const client = new Twitter({
     consumer_key: config.twitter.consumer_key,
@@ -47,7 +54,7 @@ module.exports = function(handle) {
 
   return {
     post: function(feedItem) {
-      return new Promise((resolve, reject) => {
+      const p = new Promise((resolve, reject) => {
         if (feedItem.Image) {
           postWithMedia(feedItem, (err, res) => {
             if (err) { return reject(err); }
@@ -59,6 +66,10 @@ module.exports = function(handle) {
             return resolve(res);
           });
         }
+      });
+      return p.then(() => {
+        console.log(`Tweeting from ${handle.Name}`);
+        return sleep();
       });
     }
   };
