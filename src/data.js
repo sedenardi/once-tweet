@@ -88,7 +88,7 @@ module.exports = function(opts) {
     trim: function() {
       return this.run(
         'delete from Items where PubDate < ?;',
-        [moment().subtract(4, 'hours').toDate()]
+        [moment().subtract(36, 'hours').toDate()]
       );
     },
     close: function() {
