@@ -2,5 +2,5 @@ node_modules/
 .DS_Store
 config.js
 *.sqlite*
-test.js
+*test*.js
 *.zip

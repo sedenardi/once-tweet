@@ -4,19 +4,19 @@ const Twitter = require('twitter');
 const request = require('request');
 const config = require('../config');
 
-const SLEEP_TIME = 8*1000;
+const SLEEP_TIME = 6*1000;
 const sleep = function() {
   return new Promise((resolve) => {
     setTimeout(() => { resolve(); }, SLEEP_TIME);
   });
 };
 
-module.exports = function(handle) {
+module.exports = function(feed) {
   const client = new Twitter({
     consumer_key: config.twitter.consumer_key,
     consumer_secret: config.twitter.consumer_secret,
-    access_token_key: handle.Key,
-    access_token_secret: handle.Secret
+    access_token_key: feed.Key,
+    access_token_secret: feed.Secret
   });
 
   const retryablePost = function(status, cb) {
@@ -24,12 +24,12 @@ module.exports = function(handle) {
       if (error) {
         if (error.length) {
           if (error[0].code === 187) {
-            console.log(`Dupe tweet from ${handle.Name}: ${status.status}`);
+            console.log(`Dupe tweet from ${feed.Handle}: ${status.status}`);
             return cb();
           }
         }
         console.log(error);
-        setTimeout(() => { retryablePost(status, cb); }, 1000*10);
+        setTimeout(() => { retryablePost(status, cb); }, 1000*8);
       } else { cb(null, response); }
     });
   };
@@ -71,7 +71,7 @@ module.exports = function(handle) {
         }
       });
       return p.then(() => {
-        console.log(`Tweeting from ${handle.Name}`);
+        console.log(`Tweeting from ${feed.Handle}`);
         return !last ? sleep() : Promise.resolve();
       });
     }

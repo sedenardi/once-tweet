@@ -3,6 +3,7 @@
 const cheerio = require('cheerio');
 const moment = require('moment');
 const _ = require('lodash');
+const dynamo = require('./dynamo')();
 const twitter = require('./twitter');
 
 class FeedItem {
@@ -12,19 +13,26 @@ class FeedItem {
     this.PubDate = item.PubDate;
     this.Image = item.Image;
   }
-  save(data) {
-    return data.run(
-      'insert into Items(Url,PubDate) values (?,?);',
-      [this.Url, this.PubDate]);
+  save() {
+    return dynamo.put({
+      TableName: 'rss_Items',
+      Item: {
+        Url: this.Url,
+        PubDate: moment(this.PubDate).valueOf()
+      }
+    });
   }
-  run(data, handle, last) {
-    return data.get('select * from Items where Url like ?;', [this.Url]).then((res) => {
-      if (res) {
+  run(feed, last) {
+    return dynamo.get({
+      TableName: 'rss_Items',
+      Key: { Url: this.Url }
+    }).then((res) => {
+      if (res.Item) {
         return Promise.resolve();
       }
-      return this.save(data).then(() => {
-        if (moment().diff(this.PubDate) < moment.duration(3, 'hours') && handle) {
-          const twit = twitter(handle);
+      return this.save().then(() => {
+        if (moment().diff(this.PubDate) < moment.duration(3, 'hours') && feed.Handle) {
+          const twit = twitter(feed);
           return twit.post(this, last);
         } else {
           return Promise.resolve();

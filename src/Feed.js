@@ -11,10 +11,12 @@ class Feed {
     this.Name = feed.Name;
     this.Urls = feed.Urls;
     this.Handle = feed.Handle;
+    this.Key = feed.Key;
+    this.Secret = feed.Secret;
 
     this.LastUpdate = feed.LastUpdate;
   }
-  run(data) {
+  run() {
     return fetcher(this.Urls).then((res) => {
       const items = _(res)
         .filter((r) => { return r.pubDate > this.LastUpdate; })
@@ -25,18 +27,15 @@ class Feed {
       console.log(`${items.length} items in ${this.Name}`);
       const seq = items.reduce((r, v, i) => {
         const last = i === (items.length - 1);
-        r = r.then(() => { return v.run(data, this.Handle, last); });
+        r = r.then(() => { return v.run(this, last); });
         return r;
       }, Promise.resolve());
       return seq;
     });
   }
 }
-Feed.parse = function(feed, data) {
-  feed.Urls = _(data[1]).filter({ FeedId: feed.id }).map('Url').value();
-  feed.Handle = _.find(data[2], { FeedId: feed.id });
-
-  const lastUpdate = _.find(data[3], { Name: 'LastUpdate' });
+Feed.parse = function(feed, meta) {
+  const lastUpdate = _.find(meta, { Name: 'LastUpdate' });
   feed.LastUpdate = lastUpdate.Value ? moment(lastUpdate.Value) : moment().subtract(3, 'hours');
 
   return new Feed(feed);
