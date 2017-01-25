@@ -4,7 +4,6 @@ const cheerio = require('cheerio');
 const moment = require('moment');
 const _ = require('lodash');
 const dynamo = require('./dynamo')();
-const twitter = require('./twitter');
 
 class FeedItem {
   constructor(item) {
@@ -22,7 +21,7 @@ class FeedItem {
       }
     });
   }
-  run(feed, last) {
+  run(twit, last) {
     return dynamo.get({
       TableName: 'rss_Items',
       Key: { Url: this.Url }
@@ -31,8 +30,7 @@ class FeedItem {
         return Promise.resolve();
       }
       return this.save().then(() => {
-        if (moment().diff(this.PubDate) < moment.duration(3, 'hours') && feed.Handle) {
-          const twit = twitter(feed);
+        if (moment().diff(this.PubDate) < moment.duration(3, 'hours')) {
           return twit.post(this, last);
         } else {
           return Promise.resolve();

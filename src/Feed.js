@@ -2,6 +2,7 @@
 
 const _ = require('lodash');
 const moment = require('moment');
+const twitter = require('./twitter');
 const fetcher = require('./fetcher');
 const FeedItem = require('./FeedItem');
 
@@ -25,9 +26,10 @@ class Feed {
         .orderBy(['PubDate'], ['asc'])
         .value();
       console.log(`${items.length} items in ${this.Name}`);
+      const twit = twitter(this);
       const seq = items.reduce((r, v, i) => {
         const last = i === (items.length - 1);
-        r = r.then(() => { return v.run(this, last); });
+        r = r.then(() => { return v.run(twit, last); });
         return r;
       }, Promise.resolve());
       return seq;
