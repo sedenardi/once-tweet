@@ -24,7 +24,8 @@ class FeedItem {
   run(twit, last) {
     return dynamo.get({
       TableName: 'rss_Items',
-      Key: { Url: this.Url }
+      Key: { Url: this.Url },
+      ConsistentRead: true
     }).then((res) => {
       if (res.Item) {
         return Promise.resolve();
