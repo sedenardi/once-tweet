@@ -15,5 +15,6 @@ rss-tweet is a framework for tweeting out the contents of RSS feeds.
 - [@npr_once](https://twitter.com/npr_once) - NPR
 - [@reuters_once](https://twitter.com/reuters_once) - Reuters
 - [@aj_once](https://twitter.com/aj_once) - Al Jazeera
+- [@politico_once](https://twitter.com/politico_once) - Politico
 
 Tweet at [@srednass](https://twitter.com/srednass) or add an issue here to suggest a new publication's feed.
