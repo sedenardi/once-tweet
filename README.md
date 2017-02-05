@@ -1,7 +1,9 @@
-rss-tweet
+once-tweet
 =========
 
-rss-tweet is a framework for tweeting out the contents of RSS feeds.
+rss-tweet is a framework for retweeting news story Twitter feeds just once.
+
+This is a fork of [rss-tweet](https://github.com/sedenardi/rss-tweet).
 
 ## Feeds
 

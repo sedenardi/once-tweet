@@ -1,29 +1,28 @@
 'use strict';
 
-const cheerio = require('cheerio');
 const moment = require('moment');
 const _ = require('lodash');
+const req = require('./req');
 const dynamo = require('./dynamo')();
 
 class FeedItem {
   constructor(item) {
-    this.Title = item.Title;
+    this.id_str = item.id_str;
     this.Url = item.Url;
-    this.PubDate = item.PubDate;
-    this.Image = item.Image;
+    this.created_at = item.created_at;
   }
   save() {
     return dynamo.put({
-      TableName: 'rss_Items',
+      TableName: 'once_Items',
       Item: {
         Url: this.Url,
-        PubDate: moment(this.PubDate).valueOf()
+        created_at: this.created_at
       }
     });
   }
   run(twit, last) {
     return dynamo.get({
-      TableName: 'rss_Items',
+      TableName: 'once_Items',
       Key: { Url: this.Url },
       ConsistentRead: true
     }).then((res) => {
@@ -31,42 +30,27 @@ class FeedItem {
         return Promise.resolve();
       }
       return this.save().then(() => {
-        if (moment().diff(this.PubDate) < moment.duration(3, 'hours')) {
-          return twit.post(this, last);
-        } else {
-          return Promise.resolve();
-        }
+        return twit ? twit.retweet(this.id_str, last) : Promise.resolve();
       });
     }).catch((err) => {
       console.log(err);
     });
   }
-  tweetString() {
-    return `${this.Title.slice(0, 116)} ${this.Url}`;
-  }
 }
 FeedItem.parse = function(rawItem) {
   const item = {
-    Title: rawItem.title,
-    Url: rawItem.link.split(/[?#]/)[0].toLowerCase(),
-    PubDate: rawItem.pubDate
+    id_str: rawItem.id_str,
+    created_at: moment(rawItem.created_at, 'dd MMM DD HH:mm:ss ZZ YYYY').valueOf()
   };
 
-  if (rawItem.description) {
-    const $ = cheerio.load(`<body>${rawItem.description}</body>`);
-    const imgs = $('body').find('img');
-    if (imgs.length) {
-      item.Image = imgs.eq(0).attr('src');
-    } else {
-      const media = _.get(rawItem, '[media:content][@]');
-      if (media && media.medium === 'image' &&
-        (parseInt(media.width) > 400 || parseInt(media.height) > 400 || (!media.width && !media.height))) {
-        item.Image = media.url;
-      }
-    }
+  if (rawItem.entities.urls.length) {
+    return req.head(rawItem.entities.urls[0].expanded_url).then((url) => {
+      item.Url = url.split(/[?#]/)[0].toLowerCase();
+      return Promise.resolve(new FeedItem(item));
+    });
+  } else {
+    return Promise.resolve(null);
   }
-
-  return new FeedItem(item);
 };
 
 module.exports = FeedItem;

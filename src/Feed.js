@@ -2,44 +2,58 @@
 
 const _ = require('lodash');
 const moment = require('moment');
+const BigNumber = require('bignumber.js');
 const twitter = require('./twitter');
-const fetcher = require('./fetcher');
 const FeedItem = require('./FeedItem');
 
 class Feed {
   constructor(feed) {
     this.id = feed.id;
     this.Name = feed.Name;
-    this.Urls = feed.Urls;
+    this.ScreenNames = feed.ScreenNames;
     this.Handle = feed.Handle;
     this.Key = feed.Key;
     this.Secret = feed.Secret;
 
-    this.LastUpdate = feed.LastUpdate;
+    this.Since = feed.Since;
   }
   run() {
-    return fetcher(this.Urls).then((res) => {
+    const twit = twitter(this);
+    const fetches = this.ScreenNames.map((n) => {
+      return twit.getTimeline(n, this.Since);
+    });
+    return Promise.all(fetches).then((res) => {
+      const itemActions = _(res)
+        .flatten()
+        .map((t) => { return FeedItem.parse(t); })
+        .value();
+      return Promise.all(itemActions);
+    }).then((res) => {
       const items = _(res)
-        .filter((r) => { return r.pubDate > this.LastUpdate; })
-        .map(FeedItem.parse)
+        .compact()
         .uniqBy('Url')
-        .orderBy(['PubDate'], ['asc'])
+        .orderBy(['created_at'], ['asc'])
         .value();
       console.log(`${items.length} items in ${this.Name}`);
-      const twit = twitter(this);
       const seq = items.reduce((r, v, i) => {
         const last = i === (items.length - 1);
         r = r.then(() => { return v.run(twit, last); });
         return r;
       }, Promise.resolve());
-      return seq;
+      return seq.then(() => {
+        if (items.length) {
+          const ids = _.map(items, 'id_str');
+          const max = BigNumber.max(ids);
+          return Promise.resolve(max);
+        } else {
+          return Promise.resolve();
+        }
+      });
     });
   }
 }
 Feed.parse = function(feed, meta) {
-  const lastUpdate = _.find(meta, { Name: 'LastUpdate' });
-  feed.LastUpdate = lastUpdate.Value ? moment(lastUpdate.Value) : moment().subtract(3, 'hours');
-
+  feed.Since = _.find(meta, { Name: 'since_id' }).Value;
   return new Feed(feed);
 };
 
