@@ -18,5 +18,6 @@ This is a fork of [rss-tweet](https://github.com/sedenardi/rss-tweet).
 - [@reuters_once](https://twitter.com/reuters_once) - Reuters
 - [@aj_once](https://twitter.com/aj_once) - Al Jazeera
 - [@politico_once](https://twitter.com/politico_once) - Politico
+- [@bloomberg_once](https://twitter.com/bloomberg_once) - Bloomberg
 
 Tweet at [@srednass](https://twitter.com/srednass) or add an issue here to suggest a new publication's feed.
