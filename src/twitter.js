@@ -35,9 +35,14 @@ module.exports = function(feed) {
     });
   };
 
+  const getTweet = function(id) {
+    return client.get('statuses/show', { id: id });
+  };
+
   return {
     lookup: lookup,
     getTimeline: getTimeline,
-    retweet: retweet
+    retweet: retweet,
+    getTweet
   };
 };

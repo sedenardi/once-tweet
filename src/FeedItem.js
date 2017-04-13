@@ -44,9 +44,17 @@ FeedItem.parse = function(rawItem) {
   };
 
   if (rawItem.entities.urls.length) {
-    return req.head(rawItem.entities.urls[0].expanded_url).then((url) => {
-      item.Url = url.split(/[?#]/)[0].toLowerCase();
-      return Promise.resolve(new FeedItem(item));
+    const expandedUrl = rawItem.entities.urls[0].expanded_url;
+    let urlAction = Promise.resolve(expandedUrl);
+    if (expandedUrl.indexOf(rawItem.id_str) !== -1) {
+      return req.getCardUrl(expandedUrl);
+    }
+    return urlAction.then((url) => {
+      if (!url) { return Promise.resolve(null); }
+      return req.head(url).then((resolvedUrl) => {
+        item.Url = resolvedUrl.split(/[?#]/)[0].toLowerCase();
+        return Promise.resolve(new FeedItem(item));
+      });
     });
   } else {
     return Promise.resolve(null);
