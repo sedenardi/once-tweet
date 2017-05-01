@@ -47,7 +47,7 @@ FeedItem.parse = function(rawItem) {
     const expandedUrl = rawItem.entities.urls[0].expanded_url;
     let urlAction = Promise.resolve(expandedUrl);
     if (expandedUrl.indexOf(rawItem.id_str) !== -1) {
-      return req.getCardUrl(expandedUrl);
+      urlAction = req.getCardUrl(expandedUrl);
     }
     return urlAction.then((url) => {
       if (!url) { return Promise.resolve(null); }
