@@ -20,5 +20,6 @@ This is a fork of [rss-tweet](https://github.com/sedenardi/rss-tweet).
 - [@politico_once](https://twitter.com/politico_once) - Politico
 - ~~[@bloomberg_once](https://twitter.com/bloomberg_once) - Bloomberg~~ Suspended by Twitter for "impersonation". Their support is unresponsive.
 - [@bizweek_once](https://twitter.com/bizweek_once) - Businessweek
+- [@fortune_once](https://twitter.com/fortune_once) - Fortune
 
 Tweet at [@srednass](https://twitter.com/srednass) or add an issue here to suggest a new publication's feed.
