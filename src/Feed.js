@@ -54,6 +54,7 @@ class Feed {
 }
 Feed.parse = function(feed, meta) {
   feed.Since = _.find(meta, { Name: 'since_id' }).Value;
+  feed.ScreenNames = feed.ScreenNames.split(',');
   return new Feed(feed);
 };
 
