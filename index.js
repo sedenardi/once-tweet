@@ -1,9 +1,9 @@
 'use strict';
 
 const Feeds = require('./src/Feeds');
-const db = require('./src/db')();
 
 const run = function() {
+  const db = require('./src/db')();
   return Feeds.get(db).then((feeds) => {
     return feeds.run().then(() => {
       return feeds.cleanup();
@@ -16,9 +16,9 @@ const run = function() {
 module.exports = {
   handler: (event, context, callback) => {
     run().then(() => {
-      callback();
+      context.done();
     }).catch((err) => {
-      callback(err);
+      context.done(err);
     });
   }
 };

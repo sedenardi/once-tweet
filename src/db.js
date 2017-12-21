@@ -28,6 +28,7 @@ module.exports = function() {
       return new Promise((resolve, reject) => {
         pool.end((err) => {
           if (err) { return reject(err); }
+          console.log('Closing database.');
           return resolve();
         });
       });
