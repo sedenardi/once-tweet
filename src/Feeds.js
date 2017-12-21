@@ -35,6 +35,11 @@ class Feeds {
       return this.save(maxes);
     });
   }
+  cleanup() {
+    const threshold = moment().subtract(3, 'months').unix();
+    const sql = 'delete from once_tweet.Items where created_at < ?';
+    return db.query(sql, [threshold]);
+  }
 }
 Feeds.get = function(db) {
   return Promise.all([

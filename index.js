@@ -5,7 +5,9 @@ const db = require('./src/db')();
 
 const run = function() {
   return Feeds.get(db).then((feeds) => {
-    return feeds.run();
+    return feeds.run().then(() => {
+      return feeds.cleanup();
+    });
   }).then(() => {
     return db.end();
   });
