@@ -16,6 +16,7 @@ class Feed {
     this.Secret = feed.Secret;
 
     this.Since = feed.Since;
+    this.db = feed.db;
   }
   run() {
     const twit = twitter(this);
@@ -25,7 +26,7 @@ class Feed {
     return Promise.all(fetches).then((res) => {
       const itemActions = _(res)
         .flatten()
-        .map((t) => { return FeedItem.parse(t); })
+        .map((t) => { return FeedItem.parse(t, this.db); })
         .value();
       return Promise.all(itemActions);
     }).then((res) => {
@@ -52,8 +53,10 @@ class Feed {
     });
   }
 }
-Feed.parse = function(feed, meta) {
+Feed.parse = function(feed, meta, db) {
   feed.Since = _.find(meta, { Name: 'since_id' }).Value;
+  feed.ScreenNames = feed.ScreenNames.split(',');
+  feed.db = db;
   return new Feed(feed);
 };
 

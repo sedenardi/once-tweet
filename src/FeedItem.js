@@ -3,30 +3,31 @@
 const moment = require('moment');
 const _ = require('lodash');
 const req = require('./req');
-const dynamo = require('./dynamo')();
+const crypto = require('crypto');
 
 class FeedItem {
   constructor(item) {
     this.id_str = item.id_str;
+    this.handle = item.handle;
     this.Url = item.Url;
+    this.Hash = item.Hash;
     this.created_at = item.created_at;
+    this.db = item.db;
   }
   save() {
-    return dynamo.put({
-      TableName: 'once_Items',
-      Item: {
-        Url: this.Url,
-        created_at: this.created_at
-      }
-    });
+    const sql = 'insert into once_tweet.Items(`Hash`,ScreenName,id_str,Url,created_at) value(?,?,?,?,?);';
+    return this.db.query(sql, [
+      this.Hash,
+      this.handle,
+      this.id_str,
+      this.Url,
+      this.created_at.toString().slice(0, -3)
+    ]);
   }
   run(twit, last) {
-    return dynamo.get({
-      TableName: 'once_Items',
-      Key: { Url: this.Url },
-      ConsistentRead: true
-    }).then((res) => {
-      if (res.Item) {
+    const sql = 'select * from once_tweet.Items where `Hash` = ?;';
+    return this.db.query(sql, [this.Hash]).then((res) => {
+      if (res[0]) {
         return Promise.resolve();
       }
       return this.save().then(() => {
@@ -37,10 +38,12 @@ class FeedItem {
     });
   }
 }
-FeedItem.parse = function(rawItem) {
+FeedItem.parse = function(rawItem, db) {
   const item = {
     id_str: rawItem.id_str,
-    created_at: moment(rawItem.created_at, 'dd MMM DD HH:mm:ss ZZ YYYY').valueOf()
+    handle: rawItem.user.screen_name,
+    created_at: moment(rawItem.created_at, 'dd MMM DD HH:mm:ss ZZ YYYY').valueOf(),
+    db: db
   };
 
   if (rawItem.entities.urls.length) {
@@ -53,6 +56,7 @@ FeedItem.parse = function(rawItem) {
       if (!url) { return Promise.resolve(null); }
       return req.head(url).then((resolvedUrl) => {
         item.Url = resolvedUrl.split(/[?#]/)[0].toLowerCase();
+        item.Hash = crypto.createHash('sha1').update(item.Url).digest('hex');
         return Promise.resolve(new FeedItem(item));
       });
     });

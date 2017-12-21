@@ -4,10 +4,17 @@ const moment = require('moment');
 const _ = require('lodash');
 const BigNumber = require('bignumber.js');
 const Feed = require('./Feed');
-const dynamo = require('./dynamo')();
+
+const feedsQuery = (db) => { return db.query('select * from once_tweet.Feeds;'); };
+const metaQuery = (db) => { return db.query('select * from once_tweet.Meta;'); };
+const metaUpdate = (db, max) => {
+  const sql = 'update once_tweet.Meta set `Value` = ? where `Name` = \'since_id\'';
+  return db.query(sql, [max]);
+};
 
 class Feeds {
   constructor(feeds) {
+    this.db = feeds.db;
     this.Feeds = feeds.Feeds;
   }
   save(maxes) {
@@ -17,13 +24,7 @@ class Feeds {
       .value();
     if (compacted.length) {
       const max = BigNumber.max(compacted);
-      return dynamo.put({
-        TableName: 'once_Meta',
-        Item: {
-          Name: 'since_id',
-          Value: max.toString()
-        }
-      });
+      return metaUpdate(this.db, max.toString());
     } else {
       return Promise.resolve();
     }
@@ -34,16 +35,24 @@ class Feeds {
       return this.save(maxes);
     });
   }
-}
-Feeds.get = function() {
-  return Promise.all([
-    dynamo.scan({ TableName: 'once_Feeds' }),
-    dynamo.scan({ TableName: 'once_Meta' })
-  ]).then((res) => {
-    const feeds = res[0].Items.map((v) => {
-      return Feed.parse(v, res[1].Items);
+  cleanup() {
+    const threshold = moment().subtract(3, 'months').unix();
+    const sql = 'delete from once_tweet.Items where created_at < ?';
+    return this.db.query(sql, [threshold]).then((res) => {
+      console.log(`${res.affectedRows} rows cleaned up.`);
+      return Promise.resolve();
     });
-    return Promise.resolve(new Feeds({ Feeds: feeds }));
+  }
+}
+Feeds.get = function(db) {
+  return Promise.all([
+    feedsQuery(db),
+    metaQuery(db)
+  ]).then((res) => {
+    const feeds = res[0].map((v) => {
+      return Feed.parse(v, res[1], db);
+    });
+    return Promise.resolve(new Feeds({ db: db, Feeds: feeds }));
   });
 };
 

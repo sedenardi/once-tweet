@@ -1,12 +1,19 @@
 {
   "name": "once-tweet",
   "main": "index.js",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sedenardi/once-tweet.git"
+  },
+  "author": "Sanders DeNardi",
+  "homepage": "https://github.com/sedenardi/once-tweet#readme",
   "dependencies": {
-    "aws-sdk": "^2.7.27",
     "bignumber.js": "^4.0.0",
     "cheerio": "^0.22.0",
     "lodash": "^4.17.4",
     "moment": "^2.17.1",
+    "mysql2": "^1.5.1",
     "request": "^2.79.0",
     "twitter": "^1.7.0"
   },
