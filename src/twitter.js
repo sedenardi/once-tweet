@@ -30,7 +30,7 @@ module.exports = function(feed) {
 
   const retweet = function(id, last) {
     return client.post(`statuses/retweet/${id}`, {}).then(() => {
-      console.log(`Tweeting from ${feed.Handle}`);
+      console.log(`Tweeting ${id} from ${feed.Handle}`);
       return !last ? sleep() : Promise.resolve();
     });
   };

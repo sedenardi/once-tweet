@@ -1,12 +1,13 @@
 'use strict';
 
 const Feeds = require('./src/Feeds');
+const db = require('./src/db')();
 
 const run = function() {
-  return Feeds.get().then((feeds) => {
+  return Feeds.get(db).then((feeds) => {
     return feeds.run();
-  }).catch((err) => {
-    console.log(err);
+  }).then(() => {
+    return db.end();
   });
 };
 
