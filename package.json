@@ -9,7 +9,6 @@
   "author": "Sanders DeNardi",
   "homepage": "https://github.com/sedenardi/once-tweet#readme",
   "dependencies": {
-    "aws-sdk": "^2.7.27",
     "bignumber.js": "^4.0.0",
     "cheerio": "^0.22.0",
     "lodash": "^4.17.4",
