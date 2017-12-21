@@ -38,7 +38,10 @@ class Feeds {
   cleanup() {
     const threshold = moment().subtract(3, 'months').unix();
     const sql = 'delete from once_tweet.Items where created_at < ?';
-    return db.query(sql, [threshold]);
+    return this.db.query(sql, [threshold]).then((res) => {
+      console.log(`${res.affectedRows} rows cleaned up.`);
+      return Promise.resolve();
+    });
   }
 }
 Feeds.get = function(db) {

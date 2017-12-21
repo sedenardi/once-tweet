@@ -38,7 +38,7 @@ class Feed {
       console.log(`${items.length} items in ${this.Name}`);
       const seq = items.reduce((r, v, i) => {
         const last = i === (items.length - 1);
-        r = r.then(() => { return v.run(/*twit*/null, last); });
+        r = r.then(() => { return v.run(twit, last); });
         return r;
       }, Promise.resolve());
       return seq.then(() => {
