@@ -1,10 +1,9 @@
-'use strict';
-
 const _ = require('lodash');
 const moment = require('moment');
 const BigNumber = require('bignumber.js');
 const twitter = require('./twitter');
 const FeedItem = require('./FeedItem');
+const log = require('./logger');
 
 class Feed {
   constructor(feed) {
@@ -20,10 +19,12 @@ class Feed {
   }
   run() {
     const twit = twitter(this);
+    log(`Fetching tweets for ${this.Name}`);
     const fetches = this.ScreenNames.map((n) => {
       return twit.getTimeline(n, this.Since);
     });
     return Promise.all(fetches).then((res) => {
+      log(`Found ${res.length} tweets for ${this.Name}`);
       const itemActions = _(res)
         .flatten()
         .map((t) => { return FeedItem.parse(t, this.db); })

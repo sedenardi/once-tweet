@@ -1,5 +1,3 @@
-'use strict';
-
 const Feeds = require('./src/Feeds');
 
 const run = function() {

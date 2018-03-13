@@ -1,9 +1,8 @@
-'use strict';
-
 const moment = require('moment');
 const _ = require('lodash');
 const req = require('./req');
 const crypto = require('crypto');
+const log = require('./logger');
 
 class FeedItem {
   constructor(item) {
@@ -25,11 +24,14 @@ class FeedItem {
     ]);
   }
   run(twit, last) {
+    log(`Checking whether tweet already exists`);
     const sql = 'select * from once_tweet.Items where `Hash` = ?;';
     return this.db.query(sql, [this.Hash]).then((res) => {
       if (res[0]) {
+        log(`Tweet does already exist`);
         return Promise.resolve();
       }
+      log(`Tweet doesn't already exist, saving`);
       return this.save().then(() => {
         return twit ? twit.retweet(this.id_str, last) : Promise.resolve();
       });

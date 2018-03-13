@@ -1,9 +1,8 @@
-'use strict';
-
 const moment = require('moment');
 const _ = require('lodash');
 const BigNumber = require('bignumber.js');
 const Feed = require('./Feed');
+const log = require('./logger');
 
 const feedsQuery = (db) => { return db.query('select * from once_tweet.Feeds;'); };
 const metaQuery = (db) => { return db.query('select * from once_tweet.Meta;'); };
@@ -45,10 +44,12 @@ class Feeds {
   }
 }
 Feeds.get = function(db) {
+  log('Fetcing feeds');
   return Promise.all([
     feedsQuery(db),
     metaQuery(db)
   ]).then((res) => {
+    log(`Found ${res[0].length} feeds`);
     const feeds = res[0].map((v) => {
       return Feed.parse(v, res[1], db);
     });

@@ -1,7 +1,11 @@
-'use strict';
-
-const request = require('request');
+let request = require('request');
 const cheerio = require('cheerio');
+const jar = request.jar();
+request = request.defaults({
+  gzip: true,
+  jar: jar,
+  maxRedirects: 9
+});
 
 const head = function(url) {
   return new Promise((resolve, reject) => {
