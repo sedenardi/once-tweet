@@ -16,6 +16,7 @@ module.exports = {
     run().then(() => {
       context.done();
     }).catch((err) => {
+      console.log(err);
       context.done(err);
     });
   }
