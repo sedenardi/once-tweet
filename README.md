@@ -5,6 +5,8 @@ rss-tweet is a framework for retweeting news story Twitter feeds just once.
 
 This is a fork of [rss-tweet](https://github.com/sedenardi/rss-tweet).
 
+**This project is now archived. The Twitter feeds are no longer active.**
+
 ## Feeds
 
 - [@wapo_once](https://twitter.com/wapo_once) - The Washington Post
